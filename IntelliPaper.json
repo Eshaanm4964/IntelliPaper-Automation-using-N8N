@@ -1,0 +1,530 @@
+{
+  "name": "IntelliPaper",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "research-paper",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f3c0dbaa-dc81-438a-8ca0-219d2160bc19",
+      "name": "Webhook",
+      "webhookId": "be1331ae-94ba-43e9-8b7d-c9fe328a6455"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b960bb47-75b8-4821-b952-3636181233e6",
+              "name": "topic",
+              "value": "={{ $json.body.topic }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "86d756df-ac3e-4b9f-a30d-2dfcd2264abb",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "https://api.openalex.org/works",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "search",
+              "value": "={{ $json.topic }}"
+            },
+            {
+              "name": "filter",
+              "value": "has_abstract:true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "128d3994-b039-4ff6-9370-e05683efbb3a",
+      "name": "HTTP – Semantic Scholar"
+    },
+    {
+      "parameters": {
+        "jsCode": "const works = $json.results;\n\nreturn works.map(work => {\n  let abstract = \"\";\n\n  if (work.abstract_inverted_index) {\n    const index = work.abstract_inverted_index;\n    const words = [];\n\n    Object.keys(index).forEach(word => {\n      index[word].forEach(position => {\n        words[position] = word;\n      });\n    });\n\n    abstract = words.join(\" \");\n  }\n\n  return {\n    json: {\n      title: work.title,\n      abstract: abstract,\n      year: work.publication_year,\n      url: work.id\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "cb6b6044-5bbe-4874-bdd6-60f0959b06c7",
+      "name": "Code – Extract Papers"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "title ",
+              "separateBy": "\n"
+            },
+            {
+              "aggregation": "concatenate",
+              "field": "abstract",
+              "separateBy": "\n"
+            },
+            {
+              "aggregation": "concatenate",
+              "field": "authors",
+              "separateBy": "\n"
+            },
+            {
+              "aggregation": "concatenate",
+              "field": "year",
+              "separateBy": "\n"
+            },
+            {
+              "aggregation": "concatenate",
+              "field": "url",
+              "separateBy": "\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        0
+      ],
+      "id": "bd92e350-f472-411b-a759-f02609875575",
+      "name": "Summarize – Combine Papers"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Research Topic:\n{{$node[\"Edit Fields – Clean Input\"].json.topic}}\n\nCollected Research Abstracts:\n\nTitles:\n{{$json.title}}\n\nAbstracts:\n{{$json.abstract}}\n\nProvide:\n\n1. Key Themes\n2. Common Methods Used\n3. Identified Limitations\n4. Research Gaps\n5. Emerging Trends\n",
+        "options": {
+          "systemMessage": "You are a senior academic research analyst.\n\nYour task:\n1. Identify major research themes.\n2. Detect recurring methodologies.\n3. Identify limitations in existing work.\n4. Highlight research gaps.\n5. Suggest emerging directions.\n\nBe analytical and structured.\nAvoid repeating raw abstracts.\nSynthesize insights across studies.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        16,
+        432
+      ],
+      "id": "492db223-b7de-4c40-b270-b4ccfda23624",
+      "name": "AI – Theme Analyzer"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Research Topic:\n{{$node[\"Edit Fields\"].json.topic}}\n\nResearch Analysis:\n{{$node[\"AI – Theme Analyzer\"].json.output}}\n\nGenerate a full structured research paper outline.\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an academic research paper writer.\n\nGenerate a complete, publication-ready research paper outline\nbased on the provided research analysis.\n\nFollow standard academic structure:\n- Title\n- Abstract\n- Introduction\n- Literature Review\n- Methodology (proposed)\n- Results (expected)\n- Discussion\n- Conclusion\n- Future Work\n\nBe formal, structured, and scholarly.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        320,
+        432
+      ],
+      "id": "b1132070-13f9-4290-b3d2-5131d55c2e4a",
+      "name": "AI – Research Outline"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Research Topic:\n{{$node[\"Edit Fields\"].json.topic}}\n\nResearch Paper Outline:\n{{$node[\"AI – Research Outline\"].json.output}}\n\nWrite the complete research paper.\n",
+        "options": {
+          "systemMessage": "You are a professional academic research writer.\n\nWrite a complete, original, plagiarism-free research paper\nbased on the provided structured outline.\n\nRequirements:\n- Formal academic tone\n- Logical coherence\n- Clear argument development\n- 2000–3000 words\n- In-text citations formatted as (Author, Year)\n- Reference list at the end (APA format)\n- No plagiarism\n- No repetition\n- Human-like scholarly writing\n\nEnsure originality and academic integrity.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        624,
+        432
+      ],
+      "id": "fdcb7ed0-57c9-41dc-9856-2fca7cdd1ea3",
+      "name": "AI – Full Paper Writer"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Rewrite the following research paper to ensure originality and remove any potential plagiarism.\n\n{{$node[\"AI – Full Paper Writer\"].json.output}}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an academic integrity expert.\n\nYour task:\n1. Rewrite the provided research paper to eliminate similarity.\n2. Improve clarity and coherence.\n3. Maintain academic tone.\n4. Preserve citations.\n5. Ensure originality.\n6. Avoid detectable AI-style phrasing.\n\nThe final version must be completely unique while preserving meaning.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        912,
+        416
+      ],
+      "id": "178d7e1d-3550-4151-8b9b-227a2ddbad8c",
+      "name": "AI – Plagiarism Cleaner"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        944
+      ],
+      "id": "2d411bd0-4191-43ab-9f50-31b0e6a81cb0",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "D8xOAMOWerydYT1k",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2384,
+        160
+      ],
+      "id": "cd97e06c-bfb7-442f-9815-557531ac4d96",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI detection evaluator.\n\nEstimate the probability (0–100%) that the following text would be flagged as AI-generated by common AI detection tools.\n\nRespond ONLY in this format:\n\nAI_Detection_Score: X\n\nWhere X is a number between 0 and 100.\n\nText:\n{{ $('AI – Full Paper Writer').item.json.output }}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1264,
+        416
+      ],
+      "id": "d83cb5e3-ae7a-44f9-92b4-51daadd71db2",
+      "name": "AI – AI Score Estimator"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2e9dc7c4-d92e-4ab4-9f94-3492bc671e2c",
+              "leftValue": "= {{$json.output.match(/\\d+/)[0]}}  ",
+              "rightValue": 20,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1632,
+        400
+      ],
+      "id": "28d49221-419a-4c8d-8a5d-7f7c63fb0148",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Rewrite the following research paper to reduce AI-detection signals.\n\nApply:\n- High variation in sentence length\n- Mix short and complex sentences\n- Avoid predictable transitions\n- Reduce formulaic academic language\n- Introduce subtle stylistic variation\n- Maintain academic credibility\n- Do NOT change meaning\n- Do NOT shorten significantly\n\nReturn only the rewritten paper.\n\nPaper:\n{{$node[\"AI – Full Paper Writer\"].json.output}}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1904,
+        176
+      ],
+      "id": "3c30d941-75c0-41be-95c6-d20c6f87a2cd",
+      "name": "AI – Deep Humanizer"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2112,
+        464
+      ],
+      "id": "a03ef19a-5de4-4c56-85a8-eae213b1f149",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "D8xOAMOWerydYT1k",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        512
+      ],
+      "id": "6e84e665-d4b7-451a-9fc9-359da626917c",
+      "name": "No Operation, do nothing"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP – Semantic Scholar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP – Semantic Scholar": {
+      "main": [
+        [
+          {
+            "node": "Code – Extract Papers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code – Extract Papers": {
+      "main": [
+        [
+          {
+            "node": "Summarize – Combine Papers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize – Combine Papers": {
+      "main": [
+        [
+          {
+            "node": "AI – Theme Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI – Theme Analyzer": {
+      "main": [
+        [
+          {
+            "node": "AI – Research Outline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI – Research Outline": {
+      "main": [
+        [
+          {
+            "node": "AI – Full Paper Writer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI – Full Paper Writer": {
+      "main": [
+        [
+          {
+            "node": "AI – Plagiarism Cleaner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI – Plagiarism Cleaner": {
+      "main": [
+        [
+          {
+            "node": "AI – AI Score Estimator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI – Theme Analyzer",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI – Research Outline",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI – Full Paper Writer",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI – Plagiarism Cleaner",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI – AI Score Estimator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI – AI Score Estimator": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI – Deep Humanizer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI – Deep Humanizer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI – Deep Humanizer": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "dee51196-cfec-4974-95b8-3095c5fafec1",
+  "meta": {
+    "instanceId": "57f576bab3b470dff763d276210bc54b90dc5b7c84cf1dfa924028eb69026cbd"
+  },
+  "id": "4qqFiHLVAkzB9osr",
+  "tags": []
+}
