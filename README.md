@@ -1,18 +1,132 @@
-ScholarFlow: Autonomous Academic Research & Synthesis PipelineScholarFlow is an enterprise-grade autonomous research pipeline that orchestrates Large Language Models (LLMs) and academic APIs to transform a single prompt into a structured, human-centric research paper. By leveraging n8n for workflow orchestration, it automates the entire lifecycle of academic writing—from literature retrieval to AI-detection mitigation.
-🏗️ System ArchitectureThe pipeline follows a modular, linear progression with iterative loops for quality assurance:Code snippetgraph TD
-    A[Webhook Trigger] --> B[Data Sanitization]
-    B --> C[Research API Integration]
-    C --> D[Synthesis & Theme Extraction]
-    D --> E[Outline Generation]
-    E --> F[Full-Text Synthesis]
-    F --> G[Humanizer Engine]
-    G --> H{AI Detection Check}
-    H -- > 20% --> G
-    H -- < 20% --> I[PDF Rendering]
-    I --> J[Final Delivery]
-🧠 Core Capabilities1. Intelligent Literature RetrievalUnlike standard LLMs, ScholarFlow ground its outputs in real-world data by querying Semantic Scholar and OpenAlex. It extracts metadata, abstracts, and key findings to ensure factual grounding.2. Thematic Synthesis & Gap AnalysisThe system doesn't just summarize; it analyzes. The Theme Analyzer node identifies:Prevailing methodological trends.Contradictions in current literature.Under-researched "gaps" for the paper to address.3. Advanced Linguistic Engineering (Humanization)To counter the "uniformity" of standard AI prose, the pipeline utilizes a recursive Detection Reduction Engine. It optimizes for:Burstiness: Varying sentence length and structural complexity.Perplexity: Utilizing nuanced vocabulary to mirror human academic styles.Iterative Refinement: Employs conditional logic to re-process text until it meets a sub-20% detection probability threshold.🛠️ Tech StackComponentTechnologyOrchestrationn8nReasoning EnginesOpenAI GPT-4o / Anthropic Claude 3.5 SonnetResearch DatabasesSemantic Scholar API / OpenAlexPDF Enginen8n Binary & HTML ConversionInterfaceRESTful Webhooks⚙️ Quick Start1. Clone & Environment SetupBashgit clone https://github.com/yourusername/scholarflow.git
+
+## AI-Powered Academic Research Automation Engine
+
+> An end-to-end research paper generation pipeline built with n8n, LLMs, and academic research APIs.
+
+---
+
+## 📌 Overview
+
+ScholarFlow is an automated academic research pipeline that:
+
+- Retrieves scholarly articles via research APIs  
+- Performs AI-driven thematic analysis  
+- Generates a structured academic research paper  
+- Reduces AI-detection signals (target ≤20%)  
+- Delivers downloadable PDF or TXT output  
+
+This project demonstrates advanced workflow automation, API orchestration, and applied AI engineering.
+
+---
+
+## 🧠 Key Features
+
+### 🔎 Automated Research Retrieval
+- Integration with Semantic Scholar / OpenAlex APIs  
+- Extracts abstracts, titles, authors, and metadata  
+- Structured JSON parsing  
+
+### 📊 AI-Based Thematic Analysis
+- Identifies trends and research gaps  
+- Synthesizes key debates  
+- Extracts methodological patterns  
+
+### 📝 Structured Research Paper Generation
+Automatically generates:
+
+- Title  
+- Abstract  
+- Introduction  
+- Literature Review  
+- Methodology  
+- Results & Discussion  
+- Conclusion  
+
+### 🧬 AI Detection Reduction Engine
+- Enhances sentence variation  
+- Reduces repetitive AI phrasing  
+- Improves burstiness and natural tone  
+- Targets ≤20% estimated AI-detection probability  
+
+### 📄 Automated File Export
+- Converts output to PDF or TXT  
+- Returns downloadable file via webhook  
+
+---
+
+## 🏗️ System Architecture
+
+Webhook  
+→ Input Cleaning  
+→ Research API  
+→ Extract & Summarize  
+→ AI Theme Analyzer  
+→ AI Outline Generator  
+→ AI Full Paper Writer  
+→ AI Humanizer  
+→ AI Score Estimator  
+→ Conditional Logic  
+→ Convert to File  
+→ Respond to User  
+
+---
+
+## 🛠️ Tech Stack
+
+- **Workflow Automation:** n8n  
+- **Language Model:** OpenAI / Compatible LLM  
+- **Research Data:** Semantic Scholar / OpenAlex  
+- **API Testing:** Postman  
+- **File Conversion:** n8n Binary Nodes  
+
+---
+
+## ⚙️ Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/scholarflow.git
 cd scholarflow
-2. Workflow ImportOpen your n8n instance.Select Import from File and upload the scholarflow_workflow.json located in the root directory.Configure your credentials for OpenAI (or your chosen LLM provider) and Semantic Scholar.3. Triggering the PipelineThe pipeline listens for a JSON payload via POST request:JSON{
-  "topic": "The impact of quantum computing on modern cryptography"
+```
+
+2. Import the workflow JSON into n8n.
+3. Configure API credentials.
+4. Activate the workflow.
+
+---
+
+## 📡 Usage
+
+Send a POST request to the webhook:
+
+```json
+{
+  "topic": "Artificial Intelligence in Healthcare"
 }
-📈 Performance TargetsWord Count: 1,500 – 2,500 words.Target AI Detection: $\le 20\%$.Format: IEEE/APA compliant structure (Abstract, Intro, Methods, Discussion, Refs).🔐 Ethical Disclaimer & LicenseScholarFlow is a tool designed for research assistance, drafting, and educational exploration. Users are responsible for ensuring academic integrity and adhering to the specific policies of their institutions regarding the use of AI in writing.Distributed under the MIT License. See LICENSE for more information.
+```
+
+The workflow will return a generated research paper file.
+
+---
+
+## 🔮 Future Enhancements
+
+- Automatic citation formatting (APA/MLA/Chicago)  
+- DOI-based reference extraction  
+- Real plagiarism detection integration  
+- Web dashboard frontend  
+- Multi-language support  
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome.  
+For major changes, please open an issue first.
+
+---
+
+## 📜 License
+
+MIT License
