@@ -1,62 +1,72 @@
-**AI-Powered Research Automation Engine**
+🚀 Overview
 
-ScholarFlow is an automated research paper generation pipeline built using n8n, AI models, and external research APIs. It streamlines the academic writing process by fetching research papers, analyzing themes, generating structured content, reducing AI-detection signals, and delivering downloadable outputs.
+ScholarFlow is an end-to-end automated research paper generation pipeline built using n8n, Large Language Models (LLMs), and academic research APIs.
 
-🚀 **Overview**
+It streamlines the academic writing workflow by:
 
-ScholarFlow automates the end-to-end academic research workflow:
+Accepting a research topic via Webhook
 
-Accepts a research topic via Webhook
+Fetching relevant research papers
 
-Fetches relevant research papers via API
+Analyzing themes and trends
 
-Extracts and summarizes key themes
+Generating a structured academic paper
 
-Generates a structured research paper
+Reducing AI-detection signals
 
-Reduces AI-detection signals using humanization logic
+Estimating AI detection probability
 
-Estimates AI detection probability
+Delivering a downloadable PDF output
 
-Generates downloadable PDF/TXT output
+This project demonstrates intelligent automation, AI orchestration, and workflow engineering in a production-ready pipeline.
 
-This project demonstrates advanced workflow automation, LLM orchestration, and intelligent content generation.
+🏗️ System Architecture
+Webhook
+   ↓
+Input Cleaning
+   ↓
+Research API (Semantic Scholar / OpenAlex)
+   ↓
+Extract & Summarize Papers
+   ↓
+AI – Theme Analyzer
+   ↓
+AI – Research Outline Generator
+   ↓
+AI – Full Paper Writer
+   ↓
+AI – Humanizer (AI Detection Reduction)
+   ↓
+AI – AI Detection Estimator
+   ↓
+Conditional Logic (≤20% Target)
+   ↓
+Convert to PDF
+   ↓
+Respond to Webhook
 
-🏗️** Architecture**
+🧠 Core Features
+🔎 1. Automated Research Retrieval
 
-**Webhook**
-→ Clean Input
-→ Research API (Semantic Scholar / OpenAlex)
-→ Extract & Summarize
-→ Theme Analyzer (LLM)
-→ Research Outline Generator
-→ Full Paper Writer
-→ AI Humanizer
-→ AI Detection Estimator
-→ Conditional Logic (≤20% AI Score)
-→ Convert to PDF
-→ Respond to User
+Fetches relevant academic papers via research APIs
 
-🧠 **Key Features**
-1. **Automated Research Fetching**
+Extracts abstracts, titles, authors, and metadata
 
-Integrates with academic APIs to retrieve research abstracts and metadata.
+Supports scalable academic search
 
-2. **AI-Based Thematic Analysis**
+📊 2. AI-Based Thematic Analysis
 
-Uses LLMs to extract:
+Identifies research trends
 
-Research trends
+Detects methodological patterns
 
-Gaps
+Highlights research gaps
 
-Methodologies
+Synthesizes key debates
 
-Key debates
+📝 3. Structured Research Paper Generation
 
-3.** Structured Academic Paper Generation**
-
-Produces:
+Automatically generates:
 
 Title
 
@@ -72,79 +82,98 @@ Results & Discussion
 
 Conclusion
 
-4. **AI Detection Reduction Engine**
+Maintains academic tone and logical structure.
 
-Applies advanced rewriting techniques to:
+🧬 4. AI-Detection Reduction Engine
 
-Increase burstiness
+Implements advanced rewriting techniques to:
+
+Increase burstiness (sentence variation)
 
 Reduce uniform syntactic patterns
 
-Improve stylistic variation
+Remove repetitive academic phrasing
+
+Introduce natural stylistic variation
 
 Target ≤20% estimated AI-detection probability
 
-5. Automated PDF Generation
+📈 5. AI Detection Estimation
 
-Outputs fully downloadable research papers via n8n binary conversion.
+Evaluates probability of AI-generated classification
 
-🛠️** Tech Stack**
+Uses conditional logic for iterative rewriting
 
-n8n – Workflow automation
+Ensures content refinement before final export
 
-OpenAI / LLM API – Content generation & humanization
+📄 6. Automated PDF Generation
 
-Semantic Scholar / OpenAlex API – Research retrieval
+Converts final output into downloadable PDF
 
-Webhook + Postman – API testing
+Delivered via Webhook response
 
-Binary Conversion Nodes – PDF/TXT output
+Supports API-based integration
 
-📦 **Installation & Setup**
-1️⃣ Clone Repository
+🛠️ Technology Stack
+Component	Technology
+Workflow Automation	n8n
+Language Model	OpenAI / Compatible LLM
+Research Data	Semantic Scholar / OpenAlex
+API Testing	Postman
+File Conversion	n8n Binary Conversion
+Output Format	PDF / TXT
+⚙️ Installation & Setup
+1️⃣ Clone the Repository
 git clone https://github.com/yourusername/scholarflow.git
+cd scholarflow
 
-2️⃣** Import Workflow into n8n**
+2️⃣ Import Workflow into n8n
 
-Open n8n
+Open your n8n instance
 
-Import provided JSON workflow file
+Import the provided workflow JSON
 
-Configure credentials
+Configure node credentials
 
-3️⃣ **Configure API Keys**
+3️⃣ Configure API Credentials
 
-Set environment variables for:
+Set up:
 
-LLM provider
+LLM API Key
 
-Research API (optional for higher rate limits)
+Research API Key (optional for higher rate limits)
 
-4️⃣ **Execute Workflow**
+4️⃣ Trigger the Workflow
 
-Trigger using:
-
-Production Webhook URL
-
-Postman POST request
-
-Example request:
+Send a POST request to the production webhook:
 
 {
   "topic": "Artificial Intelligence in Healthcare"
 }
 
-**📊 Example Output**
+📦 Example Output
 
 1500–2000 word structured research paper
 
-AI-detection estimate report
+AI detection probability estimate
 
-Downloadable PDF
+Downloadable PDF file
 
-Organized academic formatting
+Clean academic formatting
 
-**🔐 Disclaimer**
+🎯 Use Cases
+
+Academic draft generation
+
+Research ideation
+
+Literature exploration
+
+AI workflow experimentation
+
+Automation portfolio demonstration
+
+🔐 Disclaimer
 
 This project is intended for:
 
@@ -162,23 +191,34 @@ Adding proper citations
 
 Ensuring academic integrity
 
-**🧩 Future Improvements**
+Complying with institutional policies
 
-Citation auto-formatting (APA/MLA/Chicago)
+🔮 Future Enhancements
+
+Automatic citation formatting (APA/MLA/Chicago)
+
+DOI-based reference auto-generation
 
 Real plagiarism API integration
 
-Reference auto-generation from DOI
+Frontend dashboard interface
 
-Frontend dashboard
+Multi-language research support
 
-Multi-language support
+Deployment-ready API wrapper
 
-**🤝 Contributing**
+🤝 Contributing
 
-Pull requests are welcome.
-For major changes, please open an issue first to discuss improvements.
+Contributions are welcome.
 
-**📜 License**
+Fork the repository
 
-MIT License
+Create a new feature branch
+
+Submit a pull request
+
+For major improvements, please open an issue first.
+
+📜 License
+
+This project is licensed under the MIT License.
